@@ -89,3 +89,14 @@ create index if not exists idx_chat_business_session on chat_messages(business_i
 -- Note: this app only ever talks to Supabase using the "service_role" key from
 -- server-side Next.js API routes (never from the browser), so Row Level
 -- Security is left off. Do NOT expose the service_role key to the browser.
+
+-- Some Supabase projects don't auto-grant table privileges to service_role.
+-- These grants make sure it can always read/write everything above
+-- (service_role is meant to be a full-access, server-only key).
+grant usage on schema public to service_role;
+grant all on all tables in schema public to service_role;
+grant all on all sequences in schema public to service_role;
+grant execute on all functions in schema public to service_role;
+alter default privileges in schema public grant all on tables to service_role;
+alter default privileges in schema public grant all on sequences to service_role;
+alter default privileges in schema public grant execute on functions to service_role;
