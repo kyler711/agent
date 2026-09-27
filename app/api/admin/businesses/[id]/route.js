@@ -20,6 +20,11 @@ function cleanFaqs(list) {
     .filter((f) => f.question && f.answer);
 }
 
+function cleanMaxBookingsPerHour(value) {
+  const n = Math.floor(Number(value));
+  return Number.isFinite(n) && n > 0 ? n : 2;
+}
+
 export async function GET(_req, { params }) {
   if (!(await isAdminRequest())) {
     return NextResponse.json({ error: "Not authorized" }, { status: 401 });
@@ -71,6 +76,7 @@ export async function PUT(req, { params }) {
       location: (body.location || "").trim() || null,
       hours: (body.hours || "").trim() || null,
       extra_info: (body.extraInfo || "").trim() || null,
+      max_bookings_per_hour: cleanMaxBookingsPerHour(body.maxBookingsPerHour),
     })
     .eq("id", id);
 

@@ -11,6 +11,7 @@ const emptyForm = {
   location: "",
   hours: "",
   extraInfo: "",
+  maxBookingsPerHour: 2,
   services: [{ name: "", price: "", description: "" }],
   faqs: [{ question: "", answer: "" }],
 };
@@ -52,6 +53,7 @@ export default function AdminPanel({ businesses, baseUrl }) {
       location: data.business.location || "",
       hours: data.business.hours || "",
       extraInfo: data.business.extra_info || "",
+      maxBookingsPerHour: data.business.max_bookings_per_hour || 2,
       services: data.services.length
         ? data.services.map((s) => ({ name: s.name, price: s.price || "", description: s.description || "" }))
         : [{ name: "", price: "", description: "" }],
@@ -210,6 +212,16 @@ export default function AdminPanel({ businesses, baseUrl }) {
               placeholder="Opening hours (e.g. Mon-Fri 9am-6pm)"
               className="rounded-lg border px-3 py-2 text-sm sm:col-span-2"
             />
+            <label className="flex items-center gap-2 text-sm text-gray-600">
+              Max bookings per hour
+              <input
+                type="number"
+                min={1}
+                value={form.maxBookingsPerHour}
+                onChange={(e) => updateField("maxBookingsPerHour", e.target.value)}
+                className="w-20 rounded-lg border px-3 py-2 text-sm"
+              />
+            </label>
             <input
               value={form.welcomeMessage}
               onChange={(e) => updateField("welcomeMessage", e.target.value)}

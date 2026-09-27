@@ -156,7 +156,8 @@ function BookingForm({ business, sessionId, saved, onSaved, onClose }) {
   const [name, setName] = useState("");
   const [contact, setContact] = useState("");
   const [serviceWanted, setServiceWanted] = useState("");
-  const [preferredTime, setPreferredTime] = useState("");
+  const [preferredDate, setPreferredDate] = useState("");
+  const [preferredTimeOfDay, setPreferredTimeOfDay] = useState("");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -179,10 +180,16 @@ function BookingForm({ business, sessionId, saved, onSaved, onClose }) {
           name,
           contact,
           serviceWanted,
-          preferredTime,
+          preferredDate,
+          preferredTimeOfDay,
           notes,
         }),
       });
+      if (res.status === 409) {
+        const data = await res.json().catch(() => ({}));
+        setError(data.message || "That time is fully booked. Please pick a different time.");
+        return;
+      }
       if (!res.ok) throw new Error("failed");
       onSaved();
     } catch {
@@ -237,12 +244,22 @@ function BookingForm({ business, sessionId, saved, onSaved, onClose }) {
           placeholder="Service you'd like (optional)"
           className="w-full rounded-lg border px-3 py-2 text-sm"
         />
-        <input
-          value={preferredTime}
-          onChange={(e) => setPreferredTime(e.target.value)}
-          placeholder="Preferred date/time (optional)"
-          className="w-full rounded-lg border px-3 py-2 text-sm"
-        />
+        <div className="flex gap-2">
+          <input
+            type="date"
+            value={preferredDate}
+            onChange={(e) => setPreferredDate(e.target.value)}
+            aria-label="Preferred date (optional)"
+            className="w-1/2 rounded-lg border px-3 py-2 text-sm text-gray-700"
+          />
+          <input
+            type="time"
+            value={preferredTimeOfDay}
+            onChange={(e) => setPreferredTimeOfDay(e.target.value)}
+            aria-label="Preferred time (optional)"
+            className="w-1/2 rounded-lg border px-3 py-2 text-sm text-gray-700"
+          />
+        </div>
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}

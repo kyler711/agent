@@ -15,8 +15,12 @@ create table if not exists businesses (
   location text,
   hours text,                           -- free text, e.g. "Mon-Fri 9am-6pm, Sat 10am-4pm"
   extra_info text,                      -- anything else the AI should know
+  max_bookings_per_hour int not null default 2,  -- booking capacity limit
   created_at timestamptz not null default now()
 );
+
+-- Adds the column if you ran an older version of this file before.
+alter table businesses add column if not exists max_bookings_per_hour int not null default 2;
 
 create table if not exists services (
   id uuid primary key default gen_random_uuid(),
@@ -42,11 +46,17 @@ create table if not exists leads (
   name text,
   contact text,            -- phone or email
   service_wanted text,
-  preferred_time text,
+  preferred_time text,                  -- human-readable, e.g. "Sep 28, 2026 at 3:00 PM"
+  preferred_at timestamptz,             -- same moment, structured, used for capacity checks
   notes text,
   status text not null default 'new',   -- new | contacted | done
   created_at timestamptz not null default now()
 );
+
+-- Adds the column if you ran an older version of this file before.
+alter table leads add column if not exists preferred_at timestamptz;
+
+create index if not exists idx_leads_business_preferred_at on leads(business_id, preferred_at);
 
 create table if not exists chat_messages (
   id uuid primary key default gen_random_uuid(),

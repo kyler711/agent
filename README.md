@@ -129,6 +129,7 @@ That's it — the app, the database, and the AI are all now running on free tier
    - Services (name, price, short description)
    - FAQs (question/answer pairs)
    - Anything else the AI should know (policies, parking, etc.)
+   - Max bookings per hour (how many booking requests can share the same hour before the widget tells customers that time is full — defaults to 2)
 3. Click **Create business**. You'll now see two things for that business:
    - **Embed code** — one `<script>` tag. Send this to the business owner and ask them to paste it right before `</body>` on every page of their website.
    - **Dashboard link** — a private URL. Send this to the business owner so they can see their leads, booking requests, and chat history. Keep it private — anyone with the link can view that business's data.
@@ -145,3 +146,4 @@ To edit a business later (new prices, hours, etc.), click **Edit** next to it in
 - **Prompt injection ("ignore your instructions...")**: the system prompt explicitly tells the AI its role and rules can never be changed by a customer message, no matter how it's phrased. The customer's message is also always sent as a separate "user" message, never merged into the instructions themselves.
 - **Switching AI providers later**: set `AI_PROVIDER=gemini` (and fill in `GEMINI_API_KEY`) in your environment to switch, or add a new file like `lib/ai/openai.js` following the same `chatComplete({ system, messages })` shape and add a case in `lib/ai/provider.js` for a paid model.
 - **Secrets**: `SUPABASE_SERVICE_ROLE_KEY`, `GROQ_API_KEY`, `ADMIN_PASSWORD` and `ADMIN_SESSION_SECRET` must only ever be set as environment variables (`.env.local` locally, or your host's dashboard when deployed) — never inside `public/widget.js` or any file sent to the browser.
+- **Booking capacity**: this app does not connect to a real calendar — it only checks how many *other booking requests* already share the same hour for that business (via each business's "Max bookings per hour" setting in `/admin`) and tells the customer that time is full if the limit is reached. It's a simple guard against obvious overbooking, not real scheduling software — actual confirmation is still up to the business's staff.
